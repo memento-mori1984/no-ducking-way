@@ -46,15 +46,26 @@ Samsung may show **Install blocked** twice (Play Protect + Samsung):
 2. If still blocked: **Settings → Security and privacy → Auto Blocker** → turn off temporarily, or allow unknown apps.
 3. **Settings → Apps → ⋮ → Special access → Install unknown apps** → enable for **Chrome** or **My Files**.
 
-### Option D — Install from PC via USB (bypasses most blocks)
+### Option D — USB install from PC (best when still blocked)
 
-1. On phone: **Settings → About phone** → tap **Build number** 7× → **Developer options** → **USB debugging** ON.
-2. Plug USB cable → allow debugging on phone.
-3. On PC:
+**On phone:**
+
+1. **Settings → About phone** → tap **Build number** 7 times.
+2. **Settings → Developer options** → **USB debugging** ON.
+3. **Samsung:** also **Install via USB** ON (same menu).
+4. Plug USB cable → tap **Allow** on the debugging prompt.
+
+**On PC** (project folder):
 
 ```powershell
-& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" install -r NoDuckingWay-1.0.2.apk
+.\scripts\install-via-usb.ps1
 ```
+
+### Option E — Copy APK via USB, install with My Files
+
+1. On PC, copy `NoDuckingWay-1.0.2.apk` to the phone **Download** folder (USB file transfer).
+2. On phone: **My Files → Downloads** → tap APK (not Chrome).
+3. Turn off **Auto Blocker** and Play Protect scanning temporarily (Option B/C).
 
 ---
 
