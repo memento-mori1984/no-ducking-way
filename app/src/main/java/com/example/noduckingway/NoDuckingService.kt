@@ -18,6 +18,8 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
+import android.util.Log
 import androidx.core.app.NotificationCompat
 
 class NoDuckingService : Service() {
@@ -27,7 +29,25 @@ class NoDuckingService : Service() {
     private var isPlayingSilence = false
     private var playbackThread: Thread? = null
     private var routeWatcher: AudioRouteWatcher? = null
+    private var wakeLock: PowerManager.WakeLock? = null
+    private var hasAudioFocus = false
     private val mainHandler = Handler(Looper.getMainLooper())
+
+    private val focusWatchdog = object : Runnable {
+        override fun run() {
+            if (!running) return
+            val mixerMode = NoDuckingPrefs.isMixerMode(this@NoDuckingService)
+            if (!hasAudioFocus) {
+                Log.w(TAG, "Focus watchdog re-requesting focus (mixer=$mixerMode)")
+                requestAudioFocus(mixerMode)
+            }
+            if (!isPlayingSilence) {
+                Log.w(TAG, "Focus watchdog restarting silent playback")
+                startPlayingSilence(mixerMode)
+            }
+            mainHandler.postDelayed(this, FOCUS_WATCHDOG_INTERVAL_MS)
+        }
+    }
 
     private val sampleRate = 44100
     private val channelMask = AudioFormat.CHANNEL_OUT_STEREO
@@ -53,18 +73,17 @@ class NoDuckingService : Service() {
 
         running = true
         startForegroundWithType(createNotification())
+        acquireWakeLock()
         applyProtectionStrategy()
+        mainHandler.removeCallbacks(focusWatchdog)
+        mainHandler.postDelayed(focusWatchdog, FOCUS_WATCHDOG_INTERVAL_MS)
         return START_STICKY
     }
 
     private fun applyProtectionStrategy() {
-        if (NoDuckingPrefs.isMixerMode(this)) {
-            abandonAudioFocus()
-            startPlayingSilence(mixerMode = true)
-        } else {
-            requestAudioFocus()
-            startPlayingSilence(mixerMode = false)
-        }
+        val mixerMode = NoDuckingPrefs.isMixerMode(this)
+        requestAudioFocus(mixerMode)
+        startPlayingSilence(mixerMode)
     }
 
     private fun startForegroundWithType(notification: Notification) {
@@ -79,22 +98,66 @@ class NoDuckingService : Service() {
         }
     }
 
-    private fun requestAudioFocus(): Boolean {
+    private fun requestAudioFocus(mixerMode: Boolean): Boolean {
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val attrs = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_MEDIA)
-            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-            .build()
+        val attrs = if (mixerMode) {
+            AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+        } else {
+            AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build()
+        }
+
+        val focusListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
+            when (focusChange) {
+                AudioManager.AUDIOFOCUS_GAIN -> {
+                    hasAudioFocus = true
+                    Log.d(TAG, "Audio focus gained (mixer=$mixerMode)")
+                }
+                AudioManager.AUDIOFOCUS_LOSS,
+                AudioManager.AUDIOFOCUS_LOSS_TRANSIENT,
+                AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
+                    hasAudioFocus = false
+                    Log.d(TAG, "Audio focus lost ($focusChange); reclaiming")
+                    mainHandler.postDelayed({
+                        if (running) requestAudioFocus(NoDuckingPrefs.isMixerMode(this@NoDuckingService))
+                    }, 150)
+                }
+            }
+        }
 
         audioFocusRequest = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
             .setAudioAttributes(attrs)
-            .setAcceptsDelayedFocusGain(false)
+            .setAcceptsDelayedFocusGain(true)
             .setWillPauseWhenDucked(false)
-            .setOnAudioFocusChangeListener { }
+            .setOnAudioFocusChangeListener(focusListener, mainHandler)
             .build()
 
-        return audioManager.requestAudioFocus(audioFocusRequest!!) ==
-            AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+        val result = audioManager.requestAudioFocus(audioFocusRequest!!)
+        hasAudioFocus = result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED ||
+            result == AudioManager.AUDIOFOCUS_REQUEST_DELAYED
+        Log.i(TAG, "requestAudioFocus mixer=$mixerMode result=$result hasAudioFocus=$hasAudioFocus")
+        return hasAudioFocus
+    }
+
+    private fun acquireWakeLock() {
+        if (wakeLock?.isHeld == true) return
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NoDuckingWay::Silence").apply {
+            setReferenceCounted(false)
+            acquire(WAKE_LOCK_TIMEOUT_MS)
+        }
+    }
+
+    private fun releaseWakeLock() {
+        wakeLock?.let { lock ->
+            if (lock.isHeld) lock.release()
+        }
+        wakeLock = null
     }
 
     private fun buildSilentTrack(mixerMode: Boolean): AudioTrack {
@@ -189,6 +252,7 @@ class NoDuckingService : Service() {
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         audioFocusRequest?.let { audioManager.abandonAudioFocusRequest(it) }
         audioFocusRequest = null
+        hasAudioFocus = false
     }
 
     private fun createNotificationChannel() {
@@ -236,8 +300,10 @@ class NoDuckingService : Service() {
 
     override fun onDestroy() {
         running = false
+        mainHandler.removeCallbacks(focusWatchdog)
         routeWatcher?.unregister()
         stopPlayingSilence()
+        releaseWakeLock()
         abandonAudioFocus()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_REMOVE)
@@ -251,6 +317,10 @@ class NoDuckingService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     companion object {
+        private const val TAG = "NoDuckingService"
+        private const val FOCUS_WATCHDOG_INTERVAL_MS = 3000L
+        private const val WAKE_LOCK_TIMEOUT_MS = 10 * 60 * 60 * 1000L
+
         const val ACTION_STOP = "com.example.noduckingway.ACTION_STOP"
         const val NOTIFICATION_ID = 1001
         const val CHANNEL_ID = "noducking_channel"

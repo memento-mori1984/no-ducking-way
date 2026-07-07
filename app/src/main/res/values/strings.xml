@@ -3,11 +3,11 @@
     <string name="status_off">Music protection: OFF</string>
     <string name="status_on">Music protection: ON</string>
     <string name="status_sub_off">Tap the switch to keep Spotify at full volume when notifications or navigation play.</string>
-    <string name="status_sub_on">Protection is running. Add the Quick Settings tile for one-tap toggle.</string>
+    <string name="status_sub_on">Protection is running. If music still ducks, try Owner mode below.</string>
     <string name="toggle_label">Protect music volume</string>
     <string name="mode_title">Protection strategy</string>
-    <string name="mode_mixer_desc">Mixer (recommended) — silent stream only; Spotify keeps focus</string>
-    <string name="mode_owner_desc">Owner — holds media focus; try if Mixer still ducks on your phone</string>
+    <string name="mode_mixer_desc">Mixer (try first) — shields Spotify using a silent sonification stream</string>
+    <string name="mode_owner_desc">Owner — stronger shield; use if Mixer still ducks on your phone</string>
     <string name="start_on_boot">Start automatically after reboot</string>
     <string name="battery_exemption">Allow unrestricted battery use</string>
     <string name="battery_exemption_hint">Some phones kill background audio services. Tap to exempt NoDuckingWay from battery optimization.</string>

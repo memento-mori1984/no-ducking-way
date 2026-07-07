@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
         setProtectionSwitch(active)
         statusTitle.setText(if (active) R.string.status_on else R.string.status_off)
         statusSub.setText(if (active) R.string.status_sub_on else R.string.status_sub_off)
-        modeGroup.isEnabled = !active
+        modeGroup.isEnabled = true
     }
 
     private fun setProtectionSwitch(checked: Boolean) {

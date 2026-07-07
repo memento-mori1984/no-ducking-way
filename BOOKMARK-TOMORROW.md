@@ -9,7 +9,7 @@
 | What | URL / path |
 |------|------------|
 | Latest APK release | https://github.com/memento-mori1984/no-ducking-way/releases/latest |
-| Use this file | `NoDuckingWay-1.0.2.apk` (~10 MB) |
+| Use this file | `NoDuckingWay-1.0.3.apk` (~10 MB) |
 | Project on PC | `C:\Users\Ranzh\AndroidStudioProjects\NoDuckingWay` |
 | USB install script | `.\scripts\install-via-usb.ps1` |
 | Full install guide | [INSTALL-PHONE.md](INSTALL-PHONE.md) |
@@ -51,7 +51,7 @@ Or tell Grok Build: **“phone connected”** and it can run this for you.
 
 - App builds and works (Mixer/Owner modes, QS tile, boot option).
 - GitHub repo: https://github.com/memento-mori1984/no-ducking-way
-- Releases: v1.0.0 → v1.0.2 (release-signed, not debug).
+- Releases: v1.0.0 → v1.0.3 (release-signed, not debug).
 - Package ID: `com.noduckingway.app`
 - Emergent architecture plan implemented.
 

@@ -2,14 +2,14 @@
 
 **Latest release:** https://github.com/memento-mori1984/no-ducking-way/releases/latest
 
-Use **v1.0.2** or newer (proper release signing — not debug).
+Use **v1.0.3** or newer (proper release signing — not debug).
 
 ---
 
 ## Normal install
 
 1. Open the release link in **Chrome** on your phone.
-2. Expand **Assets** → download **NoDuckingWay-1.0.2.apk** (~10 MB).
+2. Expand **Assets** → download **NoDuckingWay-1.0.3.apk** (~10 MB).
 3. Open **Downloads** → tap APK → **Install**.
 4. Open **NoDuckingWay** → allow **Notifications** → turn protection **ON**.
 
@@ -63,7 +63,7 @@ Samsung may show **Install blocked** twice (Play Protect + Samsung):
 
 ### Option E — Copy APK via USB, install with My Files
 
-1. On PC, copy `NoDuckingWay-1.0.2.apk` to the phone **Download** folder (USB file transfer).
+1. On PC, copy `NoDuckingWay-1.0.3.apk` to the phone **Download** folder (USB file transfer).
 2. On phone: **My Files → Downloads** → tap APK (not Chrome).
 3. Turn off **Auto Blocker** and Play Protect scanning temporarily (Option B/C).
 
