@@ -27,7 +27,9 @@ cd no-ducking-way
 ./gradlew assembleDebug
 ```
 
-APK output: `app/build/outputs/apk/debug/app-debug.apk`
+APK output: `app/build/outputs/apk/release/app-release.apk`
+
+**Install on your phone:** [Latest release APK](https://github.com/memento-mori1984/no-ducking-way/releases/latest) — see [INSTALL-PHONE.md](INSTALL-PHONE.md) if install fails.
 
 On Windows:
 
