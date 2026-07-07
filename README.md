@@ -22,7 +22,7 @@ No Ducking Way runs a lightweight foreground service that keeps a silent audio s
 ## Build
 
 ```bash
-git clone https://github.com/SqibNation/no-ducking-way.git
+git clone https://github.com/memento-mori1984/no-ducking-way.git
 cd no-ducking-way
 ./gradlew assembleDebug
 ```
@@ -90,4 +90,4 @@ Copyright (c) 2026 Zachary H. Roberts. See [LICENSE](LICENSE).
 
 ## Credits
 
-Architecture review coordinated via [Grok Link](https://github.com/SqibNation/grok-link) and Emergent during initial development.
+Architecture review coordinated via Grok Link and Emergent during initial development.
