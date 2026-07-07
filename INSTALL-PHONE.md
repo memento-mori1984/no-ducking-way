@@ -1,46 +1,73 @@
 # Install on your phone
 
-Use release **v1.0.1** or newer:  
-https://github.com/memento-mori1984/no-ducking-way/releases/latest
+**Latest release:** https://github.com/memento-mori1984/no-ducking-way/releases/latest
 
-## Steps
+Use **v1.0.2** or newer (proper release signing — not debug).
 
-1. On your phone, open the release link in **Chrome** (not in-app GitHub browsers if possible).
-2. Expand **Assets**.
-3. Tap **NoDuckingWay-1.0.1.apk** and wait for the full download (~19 MB).
-4. Open **Downloads** → tap the APK → **Install**.
-5. If prompted, allow **Install unknown apps** for Chrome or **Files**.
-6. Open **NoDuckingWay** → allow **Notifications** → turn protection **ON**.
+---
 
-## If you see "App not installed"
+## Normal install
 
-Try these in order:
+1. Open the release link in **Chrome** on your phone.
+2. Expand **Assets** → download **NoDuckingWay-1.0.2.apk** (~10 MB).
+3. Open **Downloads** → tap APK → **Install**.
+4. Open **NoDuckingWay** → allow **Notifications** → turn protection **ON**.
 
-### 1. Remove any old copy
+---
 
-**Settings → Apps** → search **NoDucking** or **noducking** → **Uninstall** if present (including failed/partial installs).
+## "App blocked to protect your device" (Play Protect)
 
-### 2. Re-download (file often corrupt on mobile)
+This is **Google Play Protect** blocking apps not from the Play Store. No Ducking Way is your own open-source build — safe to install if you trust the GitHub repo.
 
-- Do **not** open the APK from a preview; use **Assets → download**.
-- Confirm file size is about **19 MB**, not a few KB.
-- Or download on your PC, copy to the phone via USB/Google Drive, then install from **Files**.
+### Option A — Install anyway (try first)
 
-### 3. Play Protect
+When you see **App blocked to protect your device**:
 
-When installing, if Google warns you → **Install anyway** / **More details** → **Install anyway**.
+1. Tap **More details** or **Details** (wording varies).
+2. Tap **Install anyway** or **Install without scanning**.
 
-### 4. Storage & Android version
+On some phones the button is hidden under **⋮** menu → **Install anyway**.
 
-- Free at least **100 MB** storage.
-- Requires **Android 7.0+** (released ~2016). Older phones cannot install.
+### Option B — Pause Play Protect briefly
 
-### 5. Still failing?
+1. Open **Google Play Store**.
+2. Tap your **profile icon** (top right).
+3. Tap **Play Protect**.
+4. Tap **Settings** (gear).
+5. Turn **OFF** “Scan apps with Play Protect” (or “Improve harmful app detection”).
+6. Install the APK from Downloads.
+7. Turn Play Protect **back ON** after install.
 
-Install via USB from a PC (most reliable):
+### Option C — Samsung phones
+
+Samsung may show **Install blocked** twice (Play Protect + Samsung):
+
+1. Follow Option A or B above.
+2. If still blocked: **Settings → Security and privacy → Auto Blocker** → turn off temporarily, or allow unknown apps.
+3. **Settings → Apps → ⋮ → Special access → Install unknown apps** → enable for **Chrome** or **My Files**.
+
+### Option D — Install from PC via USB (bypasses most blocks)
+
+1. On phone: **Settings → About phone** → tap **Build number** 7× → **Developer options** → **USB debugging** ON.
+2. Plug USB cable → allow debugging on phone.
+3. On PC:
 
 ```powershell
-& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" install -r NoDuckingWay-1.0.1.apk
+& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" install -r NoDuckingWay-1.0.2.apk
 ```
 
-Enable **USB debugging** on the phone first.
+---
+
+## "App not installed"
+
+1. **Uninstall** any old NoDucking / noducking app first.
+2. Re-download — file must be **~10 MB**, not a few KB.
+3. Free **100 MB** storage; need **Android 7.0+**.
+
+---
+
+## After install
+
+- Add **Quick Settings** tile for one-tap toggle.
+- Tap **Allow unrestricted battery use** on Samsung/Xiaomi if the service stops in background.
+- See [TESTING.md](TESTING.md) for the full test guide.
