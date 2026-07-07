@@ -37,12 +37,12 @@ class NoDuckingService : Service() {
         override fun run() {
             if (!running) return
             val mixerMode = NoDuckingPrefs.isMixerMode(this@NoDuckingService)
-            if (!hasAudioFocus) {
-                Log.w(TAG, "Focus watchdog re-requesting focus (mixer=$mixerMode)")
-                requestAudioFocus(mixerMode)
+            if (!mixerMode && !hasAudioFocus) {
+                Log.w(TAG, "Focus watchdog re-requesting focus (owner mode)")
+                requestAudioFocus()
             }
             if (!isPlayingSilence) {
-                Log.w(TAG, "Focus watchdog restarting silent playback")
+                Log.w(TAG, "Focus watchdog restarting silent playback (mixer=$mixerMode)")
                 startPlayingSilence(mixerMode)
             }
             mainHandler.postDelayed(this, FOCUS_WATCHDOG_INTERVAL_MS)
@@ -82,8 +82,14 @@ class NoDuckingService : Service() {
 
     private fun applyProtectionStrategy() {
         val mixerMode = NoDuckingPrefs.isMixerMode(this)
-        requestAudioFocus(mixerMode)
-        startPlayingSilence(mixerMode)
+        if (mixerMode) {
+            // Do not take audio focus — YouTube/Spotify keep playing.
+            abandonAudioFocus()
+            startPlayingSilence(mixerMode = true)
+        } else {
+            requestAudioFocus()
+            startPlayingSilence(mixerMode = false)
+        }
     }
 
     private fun startForegroundWithType(notification: Notification) {
@@ -98,25 +104,18 @@ class NoDuckingService : Service() {
         }
     }
 
-    private fun requestAudioFocus(mixerMode: Boolean): Boolean {
+    private fun requestAudioFocus(): Boolean {
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val attrs = if (mixerMode) {
-            AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build()
-        } else {
-            AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build()
-        }
+        val attrs = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .build()
 
         val focusListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
             when (focusChange) {
                 AudioManager.AUDIOFOCUS_GAIN -> {
                     hasAudioFocus = true
-                    Log.d(TAG, "Audio focus gained (mixer=$mixerMode)")
+                    Log.d(TAG, "Audio focus gained (owner mode)")
                 }
                 AudioManager.AUDIOFOCUS_LOSS,
                 AudioManager.AUDIOFOCUS_LOSS_TRANSIENT,
@@ -124,7 +123,9 @@ class NoDuckingService : Service() {
                     hasAudioFocus = false
                     Log.d(TAG, "Audio focus lost ($focusChange); reclaiming")
                     mainHandler.postDelayed({
-                        if (running) requestAudioFocus(NoDuckingPrefs.isMixerMode(this@NoDuckingService))
+                        if (running && !NoDuckingPrefs.isMixerMode(this@NoDuckingService)) {
+                            requestAudioFocus()
+                        }
                     }, 150)
                 }
             }
@@ -140,7 +141,7 @@ class NoDuckingService : Service() {
         val result = audioManager.requestAudioFocus(audioFocusRequest!!)
         hasAudioFocus = result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED ||
             result == AudioManager.AUDIOFOCUS_REQUEST_DELAYED
-        Log.i(TAG, "requestAudioFocus mixer=$mixerMode result=$result hasAudioFocus=$hasAudioFocus")
+        Log.i(TAG, "requestAudioFocus owner result=$result hasAudioFocus=$hasAudioFocus")
         return hasAudioFocus
     }
 

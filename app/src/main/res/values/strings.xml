@@ -2,12 +2,12 @@
     <string name="app_name">NoDuckingWay</string>
     <string name="status_off">Music protection: OFF</string>
     <string name="status_on">Music protection: ON</string>
-    <string name="status_sub_off">Tap the switch to keep Spotify at full volume when notifications or navigation play.</string>
-    <string name="status_sub_on">Protection is running. If music still ducks, try Owner mode below.</string>
+    <string name="status_sub_off">Tap the switch to reduce ducking while YouTube or Spotify keeps playing (Mixer mode).</string>
+    <string name="status_sub_on">Protection is running. Mixer keeps your stream playing; try Owner only if you still hear ducking.</string>
     <string name="toggle_label">Protect music volume</string>
     <string name="mode_title">Protection strategy</string>
-    <string name="mode_mixer_desc">Mixer (try first) — shields Spotify using a silent sonification stream</string>
-    <string name="mode_owner_desc">Owner — stronger shield; use if Mixer still ducks on your phone</string>
+    <string name="mode_mixer_desc">Mixer (recommended) — silent stream only; YouTube and Spotify keep playing</string>
+    <string name="mode_owner_desc">Owner — stronger anti-duck; may pause or stop other music/video apps</string>
     <string name="start_on_boot">Start automatically after reboot</string>
     <string name="battery_exemption">Allow unrestricted battery use</string>
     <string name="battery_exemption_hint">Some phones kill background audio services. Tap to exempt NoDuckingWay from battery optimization.</string>

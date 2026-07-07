@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path $PSScriptRoot -Parent
 
 if (-not $ApkPath) {
-    $ApkPath = Join-Path $root "NoDuckingWay-1.0.3.apk"
+    $ApkPath = Join-Path $root "NoDuckingWay-1.0.4.apk"
     if (-not (Test-Path $ApkPath)) {
         $ApkPath = Join-Path $root "app\build\outputs\apk\release\app-release.apk"
     }

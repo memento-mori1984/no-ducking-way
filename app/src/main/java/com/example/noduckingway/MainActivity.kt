@@ -94,9 +94,15 @@ class MainActivity : AppCompatActivity() {
                 NoDuckingPrefs.MODE_MIXER
             }
             NoDuckingPrefs.setMode(this, mode)
+            if (mode == NoDuckingPrefs.MODE_OWNER) {
+                Toast.makeText(
+                    this,
+                    "Owner mode may pause YouTube or Spotify while protection is on.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
             if (NoDuckingService.isRunning(this)) {
                 restartDuckingService()
-                Toast.makeText(this, "Switched to $mode mode", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -154,6 +160,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startDuckingService() {
+        if (!NoDuckingPrefs.isMixerMode(this)) {
+            Toast.makeText(
+                this,
+                "Owner mode may pause YouTube or Spotify while protection is on.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
         val serviceIntent = Intent(this, NoDuckingService::class.java)
         ContextCompat.startForegroundService(this, serviceIntent)
         Toast.makeText(this, "No ducking enabled", Toast.LENGTH_SHORT).show()
