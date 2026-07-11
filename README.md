@@ -88,7 +88,7 @@ BootReceiver ──if pref──► start service after BOOT_COMPLETED
 
 ## License
 
-Copyright (c) 2026 Zachary H. Roberts. See [LICENSE](LICENSE).
+Copyright (c) 2026 Arcana Veritas LLC. See [LICENSE](LICENSE).
 
 ## Credits
 
